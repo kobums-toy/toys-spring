@@ -1,0 +1,149 @@
+# =======================================
+# [공통 Common 적용] - 프로필과 무관하게 항상 적용
+# =======================================
+info:
+  app:
+    encoding: ${file.encoding}
+    java.source: ${java.version}
+    java.target: ${java.version}
+
+logging:
+  level:
+    org.springframework.web: TRACE
+
+server:
+  port: 9000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    beans:
+      cache:
+        time-to-live: 10s
+    shutdown:
+      enabled: true
+    health:
+      show-details: never
+    httptrace:
+      enabled: true
+
+path:
+  root-path: /Users/gowoobro/develop/toys/toysspring
+  upload-path: webdata
+
+devtools:
+  livereload:
+    enabled: true
+
+servlet:
+  multipart:
+    file-size-threshold: 1MB
+    max-file-size: 100MB
+    max-request-size: 100MB
+
+jwt:
+  secret: abcdefghijklmnopqrstuvwxyz123456asdfasdf
+  get:
+    token:
+      uri: /authenticate
+
+# =======================================
+# [default 프로필]
+# =======================================
+---
+spring:
+  config:
+    activate:
+      on-profile: default
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://140.82.12.99:3306/project?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+    username: project
+    password: projectdb
+  jpa:
+    generate-ddl: false
+    show-sql: true
+    open-in-view: false
+    database: mysql
+    # 변경됨: MySQL5InnoDBDialect -> MySQLDialect (Hibernate 6.x 기준)
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+  devtools:
+    livereload:
+      enabled: true
+  servlet:
+    multipart:
+      file-size-threshold: 1MB
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+# =======================================
+# [test 프로필]
+# =======================================
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:test;DB_CLOSE_ON_EXIT=FALSE
+    username: anb
+    password: anbdb
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  server:
+    port: ${random.int[8000,9000]}
+
+# =======================================
+# [dev 프로필]
+# =======================================
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlserver://localhost:1433;databaseName=project
+    username: sa
+    password: WkaQhd100%
+  jpa:
+    generate-ddl: false
+    show-sql: true
+    open-in-view: false
+    database: sql-server
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        # 변경됨: SQLServer2008Dialect -> SQLServerDialect (혹은 SQLServer2012Dialect)
+        dialect: org.hibernate.dialect.SQLServerDialect
+  server:
+    port: 9000
+
+# =======================================
+# [prd (운영) 프로필]
+# =======================================
+---
+spring:
+  config:
+    activate:
+      on-profile: prd
+  datasource:
+    url: jdbc:mariadb://<<url>>:3306/prd
+    username: anb
+    password: anbdb
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  server:
+    port: 5000
+  logging:
+    level:
+      org.springframework.web: INFO
